@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +19,21 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import microvm.commands.Command;
+import microvm.commands.CommandWithIntParam;
+import microvm.commands.CommandWithMarkerParam;
 import microvm.commands.arithmetic.AddCommand;
+import microvm.commands.arithmetic.DivCommand;
+import microvm.commands.arithmetic.MulCommand;
+import microvm.commands.arithmetic.SubCommand;
+import microvm.commands.compare.LtCommand;
+import microvm.commands.consts.ConstCommand;
+import microvm.commands.consts.FalseCommand;
+import microvm.commands.consts.TrueCommand;
+import microvm.commands.control.FJumpCommand;
+import microvm.commands.control.HaltCommand;
+import microvm.commands.control.JumpCommand;
+import microvm.commands.io.ReadCommand;
+import microvm.commands.io.WriteCommand;
 import microvm.model.InterpreterProgram;
 
 public class Parser implements Closeable {
@@ -28,7 +43,42 @@ public class Parser implements Closeable {
 			.compile("\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*:(.*)");
 
 	private static final Pattern SIMPLE_COMMAND_PATTERN = Pattern
-			.compile("([a-z]*)");
+			.compile("([a-z]+)");
+
+	private static final Pattern INTEGER_PARAMETER_COMMAND_PATTERN = Pattern
+			.compile("([a-z]+)\\s*([0-9]+)");
+
+	private static final Pattern MARKER_PARAMETER_COMMAND_PATTERN = Pattern
+			.compile("([a-z]+)\\s*([a-zA-Z_][a-zA-Z0-9_]*)");
+
+	private static final Map<String, Class<? extends Command>> COMMANDS = new HashMap<String, Class<? extends Command>>();
+	private static final Map<String, Class<? extends CommandWithIntParam>> COMMANDS_INT = new HashMap<String, Class<? extends CommandWithIntParam>>();
+	private static final Map<String, Class<? extends CommandWithMarkerParam>> COMMANDS_MARKER = new HashMap<String, Class<? extends CommandWithMarkerParam>>();
+
+	static {
+		// arithmetic
+		COMMANDS.put("add", AddCommand.class);
+		COMMANDS.put("sub", SubCommand.class);
+		COMMANDS.put("mul", MulCommand.class);
+		COMMANDS.put("div", DivCommand.class);
+
+		// consts
+		COMMANDS_INT.put("const", ConstCommand.class);
+		COMMANDS.put("true", TrueCommand.class);
+		COMMANDS.put("false", FalseCommand.class);
+
+		// io
+		COMMANDS.put("write", WriteCommand.class);
+		COMMANDS.put("read", ReadCommand.class);
+
+		//commpare
+		COMMANDS.put("lt", LtCommand.class);
+		
+		// control
+		COMMANDS.put("halt", HaltCommand.class);
+		COMMANDS_MARKER.put("jump", JumpCommand.class);
+		COMMANDS_MARKER.put("fjump", FJumpCommand.class);
+	}
 
 	private BufferedReader reader;
 
@@ -41,12 +91,17 @@ public class Parser implements Closeable {
 		this(new InputStreamReader(new FileInputStream(file), DEFAULT_CHARSET));
 	}
 
-	public InterpreterProgram parse() throws IOException, ParseException {
+	public InterpreterProgram parse() throws IOException, ParseException,
+			InstantiationException, IllegalAccessException,
+			IllegalArgumentException, SecurityException,
+			InvocationTargetException, NoSuchMethodException {
 		List<Command> commands = new ArrayList<Command>();
 		Map<String, Integer> markers = new HashMap<String, Integer>();
 
 		String line;
 		Matcher matcher;
+		int lineCounter = 0;
+
 		while ((line = reader.readLine()) != null) {
 			// check for marker (e.g. loop:)
 			if ((matcher = MARKER_PATTERN.matcher(line)).matches()) {
@@ -62,18 +117,60 @@ public class Parser implements Closeable {
 
 				// check for commands without parameters (e.g. ADD)
 				if ((matcher = SIMPLE_COMMAND_PATTERN.matcher(line)).matches()) {
-					
-					String command=matcher.group(1).toLowerCase();
-					
-					if("add".equals(command)) {
-						commands.add(new AddCommand());
+
+					String command = matcher.group(1).toLowerCase();
+
+					if (COMMANDS.containsKey(command)) {
+						commands.add(COMMANDS.get(command).newInstance());
 					} else {
-						throw new ParseException("unknown command: "+line, 0);
+						throw new ParseException("unknown command: " + command,
+								lineCounter);
 					}
-					
+
+				} else if ((matcher = INTEGER_PARAMETER_COMMAND_PATTERN
+						.matcher(line)).matches()) {
+
+					String command = matcher.group(1).toLowerCase();
+					int value = Integer.parseInt(matcher.group(2));
+
+					if (COMMANDS_INT.containsKey(command)) {
+						CommandWithIntParam cmdObject = COMMANDS_INT.get(
+								command).newInstance();
+						cmdObject.setParam(value);
+						commands.add(cmdObject);
+					} else {
+						throw new ParseException(
+								"unknown command with int param: " + command,
+								lineCounter);
+					}
+
+				} else if ((matcher = MARKER_PARAMETER_COMMAND_PATTERN
+						.matcher(line)).matches()) {
+
+					String command = matcher.group(1).toLowerCase();
+					String marker = matcher.group(2);
+
+					if (COMMANDS_MARKER.containsKey(command)) {
+						CommandWithMarkerParam cmdObject = COMMANDS_MARKER.get(
+								command).newInstance();
+						cmdObject.setParam(marker);
+						commands.add(cmdObject);
+					} else {
+						throw new ParseException(
+								"unknown command with marker param: " + command,
+								lineCounter);
+					}
+
+				} else {
+
+					throw new ParseException("cannot parse line: " + line,
+							lineCounter);
+
 				}
 
 			}
+
+			lineCounter++;
 		}
 
 		return new InterpreterProgram(commands, markers);

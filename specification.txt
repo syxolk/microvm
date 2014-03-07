@@ -15,10 +15,12 @@ Commands:
 	LOAD <address> (Load data at address and push it to stack)
 
 - Arithmetic
-	ADD (Pop two values from stack, add them and push the result back to the stack)
-	SUB (Pop two values from stack, subtract them and push the result back to the stack)
+	ADD (Pop two integers from stack, add them and push the result back to the stack)
+	SUB (Pop two integers from stack, subtract them and push the result back to the stack)
 	MUL
 	DIV (integer division) 
+	MOD
+	NEG (Pop an integer from stack, multiply by -1 and push the result back to the stack)
 
 - Comparison
 	LT (less than)

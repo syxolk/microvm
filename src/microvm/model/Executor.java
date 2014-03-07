@@ -72,4 +72,9 @@ public class Executor implements ExecutorContext {
 	public IOInterface getIO() {
 		return io;
 	}
+
+	@Override
+	public void setPC(String marker) {
+		setPC(program.getLineForMarker(marker));
+	}
 }

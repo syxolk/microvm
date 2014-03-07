@@ -9,7 +9,7 @@ public class StandardIOInterface extends StreamedIOInterface {
 	}
 	
 	public Object read() throws IOException {
-		out.println("> ");
+		out.print("> ");
 		return super.read();
 	}
 }
