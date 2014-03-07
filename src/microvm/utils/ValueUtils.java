@@ -7,7 +7,7 @@ import microvm.commands.CommandExecutionException;
 public final class ValueUtils {
 	public static final String TRUE = "true";
 	public static final String FALSE = "false";
-	public static final Pattern INTEGER_PATTERN = Pattern.compile("[0-9]+");
+	public static final Pattern INTEGER_PATTERN = Pattern.compile("\\-?[0-9]+");
 
 	public static boolean isInteger(Object obj) {
 		return obj != null && obj instanceof Integer;

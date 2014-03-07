@@ -55,7 +55,7 @@ public class Parser implements Closeable {
 
 	private static final String MARKER_REGEX = "([a-zA-Z_][a-zA-Z0-9_]*)";
 
-	private static final String INT_REGEX = "([0-9]+)";
+	private static final String INT_REGEX = "(\\-?[0-9]+)";
 
 	private static final Pattern MARKER_PATTERN = Pattern.compile("\\s*"
 			+ MARKER_REGEX + "\\s*:(.*)");
