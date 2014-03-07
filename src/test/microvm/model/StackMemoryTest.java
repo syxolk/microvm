@@ -4,14 +4,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
-import microvm.model.StackMemory;
+import microvm.model.StandardStackMemory;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 /**
- * Test class for {@link microvm.model.StackMemory}
+ * Test class for {@link microvm.model.StandardStackMemory}
  * 
  * @author Hans Kirchner
  * 
@@ -20,7 +20,7 @@ import org.junit.runners.JUnit4;
 public class StackMemoryTest {
 	@Test
 	public void testFunctionality() {
-		StackMemory st = new StackMemory();
+		StandardStackMemory st = new StandardStackMemory();
 		assertTrue(st.isEmpty());
 
 		st.push(10);
@@ -33,10 +33,10 @@ public class StackMemoryTest {
 
 	@Test
 	public void testClone() {
-		StackMemory orig = new StackMemory();
+		StandardStackMemory orig = new StandardStackMemory();
 		orig.push(10);
 
-		StackMemory clone = orig.copy();
+		StandardStackMemory clone = orig.copy();
 		assertNotSame(orig, clone);
 		assertEquals(orig, clone);
 	}

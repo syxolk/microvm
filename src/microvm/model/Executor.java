@@ -7,6 +7,7 @@ import microvm.model.interfaces.ExecutorContext;
 import microvm.model.interfaces.IOInterface;
 import microvm.model.interfaces.Program;
 import microvm.model.interfaces.RAMemory;
+import microvm.model.interfaces.StackMemory;
 
 public class Executor implements ExecutorContext {
 	private Program program;
@@ -24,11 +25,11 @@ public class Executor implements ExecutorContext {
 	}
 
 	public Executor(Program program, IOInterface io) {
-		this(program, new StackMemory(), new HashedRAMemory(), io);
+		this(program, new StandardStackMemory(), new HashedRAMemory(), io);
 	}
 
 	public Executor(Program program) {
-		this(program, new StackMemory(), new HashedRAMemory(),
+		this(program, new StandardStackMemory(), new HashedRAMemory(),
 				new StandardIOInterface());
 	}
 
