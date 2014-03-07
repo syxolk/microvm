@@ -41,6 +41,8 @@ import microvm.commands.control.HaltCommand;
 import microvm.commands.control.JumpCommand;
 import microvm.commands.io.ReadCommand;
 import microvm.commands.io.WriteCommand;
+import microvm.commands.loadstore.LoadCommand;
+import microvm.commands.loadstore.StoreCommand;
 import microvm.commands.logic.AndCommand;
 import microvm.commands.logic.NotCommand;
 import microvm.commands.logic.OrCommand;
@@ -49,17 +51,23 @@ import microvm.model.InterpreterProgram;
 public class Parser implements Closeable {
 	public static final String DEFAULT_CHARSET = "utf-8";
 
-	private static final Pattern MARKER_PATTERN = Pattern
-			.compile("\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\s*:(.*)");
+	private static final String COMMAND_REGEX = "([a-z]+)";
+
+	private static final String MARKER_REGEX = "([a-zA-Z_][a-zA-Z0-9_]*)";
+
+	private static final String INT_REGEX = "([0-9]+)";
+
+	private static final Pattern MARKER_PATTERN = Pattern.compile("\\s*"
+			+ MARKER_REGEX + "\\s*:(.*)");
 
 	private static final Pattern SIMPLE_COMMAND_PATTERN = Pattern
-			.compile("([a-z]+)");
+			.compile(COMMAND_REGEX);
 
 	private static final Pattern INTEGER_PARAMETER_COMMAND_PATTERN = Pattern
-			.compile("([a-z]+)\\s*([0-9]+)");
+			.compile(COMMAND_REGEX + "\\s*" + INT_REGEX);
 
 	private static final Pattern MARKER_PARAMETER_COMMAND_PATTERN = Pattern
-			.compile("([a-z]+)\\s*([a-zA-Z_][a-zA-Z0-9_]*)");
+			.compile(COMMAND_REGEX + "\\s*" + MARKER_REGEX);
 
 	private static final Map<String, Class<? extends Command>> COMMANDS = new HashMap<String, Class<? extends Command>>();
 	private static final Map<String, Class<? extends CommandWithIntParam>> COMMANDS_INT = new HashMap<String, Class<? extends CommandWithIntParam>>();
@@ -100,6 +108,10 @@ public class Parser implements Closeable {
 		COMMANDS.put("halt", HaltCommand.class);
 		COMMANDS_MARKER.put("jump", JumpCommand.class);
 		COMMANDS_MARKER.put("fjump", FJumpCommand.class);
+		
+		//load/store
+		COMMANDS_MARKER.put("load", LoadCommand.class);
+		COMMANDS_MARKER.put("store", StoreCommand.class);
 	}
 
 	private BufferedReader reader;

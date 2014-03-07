@@ -6,25 +6,30 @@ import microvm.commands.control.HaltCommand;
 import microvm.model.interfaces.ExecutorContext;
 import microvm.model.interfaces.IOInterface;
 import microvm.model.interfaces.Program;
+import microvm.model.interfaces.RAMemory;
 
 public class Executor implements ExecutorContext {
 	private Program program;
 	private StackMemory stack;
 	private IOInterface io;
+	private RAMemory ram;
 	private int pc = 0;
 
-	public Executor(Program program, StackMemory stack, IOInterface io) {
+	public Executor(Program program, StackMemory stack, RAMemory ram,
+			IOInterface io) {
 		this.program = program;
 		this.stack = stack;
+		this.ram = ram;
 		this.io = io;
 	}
 
 	public Executor(Program program, IOInterface io) {
-		this(program, new StackMemory(), io);
+		this(program, new StackMemory(), new HashedRAMemory(), io);
 	}
 
 	public Executor(Program program) {
-		this(program, new StackMemory(), new StandardIOInterface());
+		this(program, new StackMemory(), new HashedRAMemory(),
+				new StandardIOInterface());
 	}
 
 	@Override
@@ -76,5 +81,10 @@ public class Executor implements ExecutorContext {
 	@Override
 	public void setPC(String marker) {
 		setPC(program.getLineForMarker(marker));
+	}
+
+	@Override
+	public RAMemory getRAM() {
+		return ram;
 	}
 }

@@ -33,4 +33,9 @@ public final class ValueUtils {
 		if (!(obj instanceof Boolean))
 			throw new CommandExecutionException("popped value is not a boolean");
 	}
+
+	public static void throwExceptionIfNull(Object obj) throws CommandExecutionException {
+		if (obj == null)
+			throw new CommandExecutionException("value is null");
+	}
 }

@@ -1,5 +1,10 @@
 # MicroVM
 
+MicroVM is an implementation of a stack based machine with only two data types: int and boolean.
+It is completely implemented in Java and is currently only capable of interpreting the MicroVM code.
+
+In a future release the MicroVM code could be compiled to Java byte code and run in JavaVM.
+
 ## Memory
 - Program
 - RAM
