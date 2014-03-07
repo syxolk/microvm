@@ -23,9 +23,16 @@ import microvm.commands.CommandWithIntParam;
 import microvm.commands.CommandWithMarkerParam;
 import microvm.commands.arithmetic.AddCommand;
 import microvm.commands.arithmetic.DivCommand;
+import microvm.commands.arithmetic.ModCommand;
 import microvm.commands.arithmetic.MulCommand;
+import microvm.commands.arithmetic.NegCommand;
 import microvm.commands.arithmetic.SubCommand;
+import microvm.commands.compare.EqCommand;
+import microvm.commands.compare.GtCommand;
+import microvm.commands.compare.GteCommand;
 import microvm.commands.compare.LtCommand;
+import microvm.commands.compare.LteCommand;
+import microvm.commands.compare.NeqCommand;
 import microvm.commands.consts.ConstCommand;
 import microvm.commands.consts.FalseCommand;
 import microvm.commands.consts.TrueCommand;
@@ -34,6 +41,9 @@ import microvm.commands.control.HaltCommand;
 import microvm.commands.control.JumpCommand;
 import microvm.commands.io.ReadCommand;
 import microvm.commands.io.WriteCommand;
+import microvm.commands.logic.AndCommand;
+import microvm.commands.logic.NotCommand;
+import microvm.commands.logic.OrCommand;
 import microvm.model.InterpreterProgram;
 
 public class Parser implements Closeable {
@@ -61,6 +71,13 @@ public class Parser implements Closeable {
 		COMMANDS.put("sub", SubCommand.class);
 		COMMANDS.put("mul", MulCommand.class);
 		COMMANDS.put("div", DivCommand.class);
+		COMMANDS.put("mod", ModCommand.class);
+		COMMANDS.put("neg", NegCommand.class);
+
+		// logic
+		COMMANDS.put("and", AndCommand.class);
+		COMMANDS.put("or", OrCommand.class);
+		COMMANDS.put("not", NotCommand.class);
 
 		// consts
 		COMMANDS_INT.put("const", ConstCommand.class);
@@ -71,9 +88,14 @@ public class Parser implements Closeable {
 		COMMANDS.put("write", WriteCommand.class);
 		COMMANDS.put("read", ReadCommand.class);
 
-		//commpare
+		// commpare
 		COMMANDS.put("lt", LtCommand.class);
-		
+		COMMANDS.put("lte", LteCommand.class);
+		COMMANDS.put("eq", EqCommand.class);
+		COMMANDS.put("neq", NeqCommand.class);
+		COMMANDS.put("gt", GtCommand.class);
+		COMMANDS.put("gte", GteCommand.class);
+
 		// control
 		COMMANDS.put("halt", HaltCommand.class);
 		COMMANDS_MARKER.put("jump", JumpCommand.class);

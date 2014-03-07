@@ -13,6 +13,7 @@
 ### Load/Store
 - STORE <address> (Pop head of stack and save it to address)
 - LOAD <address> (Load data at address and push it to stack)
+- ALLOC <immediate> (allocates a given number of cells)
 
 ### Arithmetic
 - ADD (Pop two integers from stack, add them and push the result back to the stack)
@@ -31,9 +32,9 @@
 - NEQ (not equals)
 
 ### Boolean
-- ADD
-- OR
-- NOT
+- AND (logical and)
+- OR (logical or)
+- NOT (logical not)
 	
 ### Constants
 - CONST <immediate> (push immediate to stack)
